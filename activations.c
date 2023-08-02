@@ -1,31 +1,31 @@
 #include "activations.h"
 
-
-double identity(double x, bool derivative)
+float identity(float x, bool derivative)
 {
-    double ret = derivative ? 1 : x;
+    float ret = derivative ? 1 : x;
     return ret;
 }
 
-double logistic(double x, bool derivative)
+float logistic(float x, bool derivative)
 {
-    double ret = 1 / (1 + exp(-x));
+    float ret = 1 / (1 + exp(-(double)x));
     if (derivative)
         ret *= (1 - ret);
     return ret;
 }
 
-double relu(double x, bool derivative)
+float relu(float x, bool derivative)
 {
-    double ret = 0.0;
-    if (x > 0) 
+    float ret = 0.0;
+    if (x > 0)
         ret = derivative ? 1.0 : x;
     return ret;
 }
 
-double tanh(double x, bool derivative)
+float tanh(float x, bool derivative)
 {
-    double ret = (exp(x) - exp(-x)) / (exp(x) + exp(-x));
+    double xd = (double)x;
+    float ret = (exp(xd) - exp(-xd)) / (exp(xd) + exp(-xd));
     if (derivative)
         ret = 1 - ret * ret;
     return ret;

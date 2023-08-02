@@ -11,24 +11,36 @@
 #define GAUSSIAN_INIT 3
 #define HE_INIT 4
 
-
-typedef struct neuron {
-    uint16_t n;
-    double weights[n];
-    double biases[n];
+typedef struct neuron
+{
+    uint16_t input_size;
+    float *weights;
+    float *biases;
 } neuron;
 
-typedef struct layer {
+typedef struct layer
+{
+    uint16_t input_size;
     uint16_t n_neurons;
-    neuron ns[n_neurons];
     int activation;
     int initialization;
+    neuron *ns;
+    float *output;
 } layer;
 
-typedef struct network {
+typedef struct network
+{
     uint16_t n_layers;
-    layer ls[n_layers];
+    uint16_t current_layer_ind;
+    layer **ls;
 } network;
 
+int init_neuron(neuron neur, uint16_t input_size, int initialization, float init_param);
+int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initialization, int activation);
+int addinit_layer(network *nk, uint16_t input_size, uint16_t n_neurons, int initialization, int activation);
+int add_layer(network *nk, layer *l);
+void free_neuron(neuron neur);
+void free_layer(layer *l);
+void free_network(network *nk);
 
 #endif

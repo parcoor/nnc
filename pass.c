@@ -1,6 +1,5 @@
 #include "pass.h"
 
-int forward(network* nn, uint16_t output_s, double res[output_s])
+int forward(network *nk, uint16_t output_s, float res[output_s])
 {
-    
 }
