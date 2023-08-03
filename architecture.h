@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
+#include <string.h>
 
 #define GLOROT_UNIFORM_INIT 0
 #define GLOROT_GAUSSIAN_INIT 1
@@ -24,7 +26,7 @@ typedef struct layer
     uint16_t n_neurons;
     int activation;
     int initialization;
-    neuron *ns;
+    neuron **neurons;
     float *output;
 } layer;
 
@@ -32,14 +34,15 @@ typedef struct network
 {
     uint16_t n_layers;
     uint16_t current_layer_ind;
-    layer **ls;
+    layer **layers;
 } network;
 
-int init_neuron(neuron neur, uint16_t input_size, int initialization, float init_param);
+int init_neuron(neuron *neur, uint16_t input_size, int initialization, float init_param);
 int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initialization, int activation);
+int init_network(network *nk, uint16_t n_layers);
 int addinit_layer(network *nk, uint16_t input_size, uint16_t n_neurons, int initialization, int activation);
 int add_layer(network *nk, layer *l);
-void free_neuron(neuron neur);
+void free_neuron(neuron *neur);
 void free_layer(layer *l);
 void free_network(network *nk);
 

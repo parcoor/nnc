@@ -5,9 +5,13 @@
 #include <stdbool.h>
 
 #define IDENTITY_ACT 0
-#define LOGISTIC_ACT 1
+#define SIGMOID_ACT 1
 #define RELU_ACT 2
 #define TANH_ACT 3
 
+float identity(float x, bool derivative);
+float sigmoid(float x, bool derivative);
+float relu(float x, bool derivative);
+float tanhyp(float x, bool derivative);
 
 #endif

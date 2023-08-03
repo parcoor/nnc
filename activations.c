@@ -6,7 +6,7 @@ float identity(float x, bool derivative)
     return ret;
 }
 
-float logistic(float x, bool derivative)
+float sigmoid(float x, bool derivative)
 {
     float ret = 1 / (1 + exp(-(double)x));
     if (derivative)
@@ -22,10 +22,10 @@ float relu(float x, bool derivative)
     return ret;
 }
 
-float tanh(float x, bool derivative)
+float tanhyp(float x, bool derivative)
 {
     double xd = (double)x;
-    float ret = (exp(xd) - exp(-xd)) / (exp(xd) + exp(-xd));
+    float ret = (float)tanh(xd);
     if (derivative)
         ret = 1 - ret * ret;
     return ret;

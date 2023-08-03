@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "nnc_utils.h"
 #include "architecture.h"
 #include "activations.h"
 
@@ -33,7 +33,7 @@ float gauss_rand(float mean, float sigma)
 
 float uniform_rand(float min_v, float max_v)
 {
-	float value = (float)rand() / (float)RAND_MAX;
+	float value = (float)rand() / RAND_MAX;
 	return value * (max_v - min_v) + min_v;
 }
 
@@ -44,18 +44,18 @@ void print_array(FILE *f, size_t n, float arr[n])
 	printf("[");
 	for (size_t i = 0; i < n; i++)
 	{
-		fprintf(f, "%f%s", arr[i], (i == n - 1) ? ", " : "]\n");
+		fprintf(f, "%f%s", arr[i], (i == n - 1) ? "]\n" : ", ");
 	}
 	return;
 }
 
-void print_neuron(FILE *f, neuron neur)
+void print_neuron(FILE *f, neuron *neur)
 {
-	printf("Input size: %llu\n", neur.input_size);
+	printf("Input size: %llu\n", neur->input_size);
 	printf("weights: ");
-	print_array(f, (size_t)neur.input_size, neur.weights);
-	printf("\nbiases: ");
-	print_array(f, (size_t)neur.input_size, neur.biases);
+	print_array(f, (size_t)neur->input_size, neur->weights);
+	printf("biases: ");
+	print_array(f, (size_t)neur->input_size, neur->biases);
 }
 
 void get_activation_name(char activation_name[NAME_SIZE], int activation)
@@ -65,8 +65,8 @@ void get_activation_name(char activation_name[NAME_SIZE], int activation)
 	case IDENTITY_ACT:
 		strncpy(activation_name, "Identity", 9);
 		break;
-	case LOGISTIC_ACT:
-		strncpy(activation_name, "Logistic", 9);
+	case SIGMOID_ACT:
+		strncpy(activation_name, "Sigmoid", 8);
 		break;
 	case RELU_ACT:
 		strncpy(activation_name, "ReLu", 5);
@@ -80,26 +80,26 @@ void get_activation_name(char activation_name[NAME_SIZE], int activation)
 	}
 }
 
-void print_layer(FILE *f, layer l)
+void print_layer(FILE *f, layer *l)
 {
 	char activation_name[NAME_SIZE];
-	get_activation_name(activation_name, l.activation);
-	fprintf(f, "Input Size: %llu\nNumber of Neurons: %llu\nActivation: %s\n", l.input_size, l.n_neurons, activation_name);
-	for (uint16_t i = 0; i < l.n_neurons; i++)
+	get_activation_name(activation_name, l->activation);
+	fprintf(f, "Input Size: %llu\nNumber of Neurons: %llu\nActivation: %s\n", l->input_size, l->n_neurons, activation_name);
+	for (uint16_t i = 0; i < l->n_neurons; i++)
 	{
-		fprintf(f, "= Neuron %llu\n", i);
-		print_neuron(f, l.ns[i]);
+		fprintf(f, "= Neuron %llu\n", i + 1);
+		print_neuron(f, l->neurons[i]);
 	}
 }
 
-void print_network(FILE *f, network nk)
+void print_network(FILE *f, network *nk)
 {
-	printf("=== Network\nMax Number of Layers: %llu\nCurrent Number of Layers: %llu\n", nk.n_layers, nk.current_layer_ind);
-	for (uint16_t i = 0; i < nk.current_layer_ind; i++)
+	printf("=== Network\nMax Number of Layers: %llu\nCurrent Number of Layers: %llu\n", nk->n_layers, nk->current_layer_ind);
+	for (uint16_t i = 0; i < nk->current_layer_ind; i++)
 	{
-		fprintf(f, "== Layer %llu\n", i);
-		print_layer(f, nk.ls[i]);
+		fprintf(f, "== Layer %llu\n", i + 1);
+		print_layer(f, nk->layers[i]);
 	}
 }
 
-// TODO: Define functions for persisting / loadindg persisted network
+// TODO: Define functions for persisting / loading persisted network
