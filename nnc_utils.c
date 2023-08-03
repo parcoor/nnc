@@ -41,7 +41,7 @@ float uniform_rand(float min_v, float max_v)
 
 void print_array(FILE *f, size_t n, float arr[n])
 {
-	printf("[");
+	fprintf(f, "[");
 	for (size_t i = 0; i < n; i++)
 	{
 		fprintf(f, "%f%s", arr[i], (i == n - 1) ? "]\n" : ", ");
@@ -51,10 +51,10 @@ void print_array(FILE *f, size_t n, float arr[n])
 
 void print_neuron(FILE *f, neuron *neur)
 {
-	printf("Input size: %llu\n", neur->input_size);
-	printf("weights: ");
+	fprintf(f, "Input size: %u\n", (unsigned int)neur->input_size);
+	fprintf(f, "weights: ");
 	print_array(f, (size_t)neur->input_size, neur->weights);
-	printf("biases: ");
+	fprintf(f, "biases: ");
 	print_array(f, (size_t)neur->input_size, neur->biases);
 }
 
@@ -84,20 +84,22 @@ void print_layer(FILE *f, layer *l)
 {
 	char activation_name[NAME_SIZE];
 	get_activation_name(activation_name, l->activation);
-	fprintf(f, "Input Size: %llu\nNumber of Neurons: %llu\nActivation: %s\n", l->input_size, l->n_neurons, activation_name);
+	fprintf(f, "Input Size: %u\nNumber of Neurons: %u\nActivation: %s\n",
+			(unsigned int)l->input_size, (unsigned int)l->n_neurons, activation_name);
 	for (uint16_t i = 0; i < l->n_neurons; i++)
 	{
-		fprintf(f, "= Neuron %llu\n", i + 1);
+		fprintf(f, "= Neuron %u\n", (unsigned int)i + 1);
 		print_neuron(f, l->neurons[i]);
 	}
 }
 
 void print_network(FILE *f, network *nk)
 {
-	printf("=== Network\nMax Number of Layers: %llu\nCurrent Number of Layers: %llu\n", nk->n_layers, nk->current_layer_ind);
+	fprintf(f, "=== Network\nMax Number of Layers: %u\nCurrent Number of Layers: %u\n",
+			(unsigned int)nk->n_layers, (unsigned int)nk->current_layer_ind);
 	for (uint16_t i = 0; i < nk->current_layer_ind; i++)
 	{
-		fprintf(f, "== Layer %llu\n", i + 1);
+		fprintf(f, "== Layer %u\n", (unsigned int)i + 1);
 		print_layer(f, nk->layers[i]);
 	}
 }

@@ -3,25 +3,23 @@
 
 int init_neuron(neuron *neur, uint16_t input_size, int initialization, float init_param)
 {
-    printf("[DEBUG] init_neuron(): Entering (input_size: %llu)\n", input_size);
     neur->input_size = input_size;
-    
-    printf("[DEBUG] init_neuron(): Before weights allocation\n");
+
     neur->weights = (float *)malloc(input_size * sizeof(float));
     if (neur->weights == NULL)
     {
-        fprintf(stderr, "[ERROR] init_neuron(): Could not allocate %llu weights\n", input_size);
+        fprintf(stderr, "[ERROR] init_neuron(): Could not allocate %u weights\n", (unsigned int)input_size);
         return EXIT_FAILURE;
     }
-    printf("[DEBUG] init_neuron(): After weights allocation\n");
+
     neur->biases = (float *)malloc(input_size * sizeof(float));
     if (neur->biases == NULL)
     {
-        fprintf(stderr, "[ERROR] init_neuron(): Could not allocate %llu weights\n", input_size);
+        fprintf(stderr, "[ERROR] init_neuron(): Could not allocate %u weights\n", (unsigned int)input_size);
         free(neur->weights);
         return EXIT_FAILURE;
     }
-     printf("[DEBUG] init_neuron(): After biases allocation\n");
+
     for (uint16_t i = 0; i < input_size; i++)
     {
 
@@ -40,14 +38,12 @@ int init_neuron(neuron *neur, uint16_t input_size, int initialization, float ini
             break;
         }
     }
-    printf("[DEBUG] init_neuron(): init_param=%f Neuron created:\n", init_param); print_neuron(stdout, neur);
+
     return EXIT_SUCCESS;
 }
 
 int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initialization, int activation)
 {
-    printf("[DEBUG] init_layer(): initialization=%i\n", initialization);
-    
     l->input_size = input_size;
     l->n_neurons = n_neurons;
     l->initialization = initialization;
@@ -56,16 +52,16 @@ int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initializa
     l->output = (float *)malloc(n_neurons * sizeof(float));
     if (l->output == NULL)
     {
-        fprintf(stderr, "[ERROR] init_layer(): Could not allocate output (%llu floats)\n", n_neurons);
+        fprintf(stderr, "[ERROR] init_layer(): Could not allocate output (%u floats)\n", (unsigned int)n_neurons);
         free(l->neurons);
         return EXIT_FAILURE;
     }
     memset(l->output, 0, n_neurons * sizeof(float));
 
-    l->neurons = (neuron**)malloc(n_neurons * sizeof(neuron*));
+    l->neurons = (neuron **)malloc(n_neurons * sizeof(neuron *));
     if (l->neurons == NULL)
     {
-        fprintf(stderr, "[ERROR] init_layer(): Could not allocate %llu neurons in layer.\n", n_neurons);
+        fprintf(stderr, "[ERROR] init_layer(): Could not allocate %u neurons in layer.\n", (unsigned int)n_neurons);
         return EXIT_FAILURE;
     }
 
@@ -89,9 +85,10 @@ int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initializa
     int ret = EXIT_SUCCESS;
     for (uint16_t i = 0; i < n_neurons; i++)
     {
-        l->neurons[i] = (neuron*)malloc(sizeof(neuron));
-        if(l->neurons[i] == NULL) {
-            fprintf(stderr, "[ERROR] init_layer(): Could not allocate neuron %llu\n", i);
+        l->neurons[i] = (neuron *)malloc(sizeof(neuron));
+        if (l->neurons[i] == NULL)
+        {
+            fprintf(stderr, "[ERROR] init_layer(): Could not allocate neuron %u\n", (unsigned int)i);
             for (uint16_t j = 0; j < i; j++)
                 free_neuron(l->neurons[j]);
             return EXIT_FAILURE;
@@ -99,7 +96,7 @@ int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initializa
         ret = init_neuron(l->neurons[i], input_size, initialization, init_param);
         if (ret == EXIT_FAILURE)
         {
-            fprintf(stderr, "[ERROR] init_layer(): Could not initiate neuron %llu\n", i);
+            fprintf(stderr, "[ERROR] init_layer(): Could not initiate neuron %u\n", (unsigned int)i);
             for (uint16_t j = 0; j < i; j++)
                 free_neuron(l->neurons[j]);
             return EXIT_FAILURE;
@@ -112,7 +109,7 @@ int init_network(network *nk, uint16_t n_layers)
 {
     nk->n_layers = n_layers;
     nk->current_layer_ind = 0;
-    nk->layers = (layer**)malloc(n_layers * sizeof(layer*));
+    nk->layers = (layer **)malloc(n_layers * sizeof(layer *));
     if (nk->layers == NULL)
     {
         perror("[ERROR] init_network(): Could not allocate layers");
@@ -125,8 +122,8 @@ int addinit_layer(network *nk, uint16_t input_size, uint16_t n_neurons, int init
 {
     if (nk->current_layer_ind >= nk->n_layers)
     {
-        fprintf(stderr, "[ERROR] addinit_layer(): Network contains already %llu out of max. %llu layers, cannot add a new layer.\n",
-                nk->current_layer_ind + 1, nk->n_layers);
+        fprintf(stderr, "[ERROR] addinit_layer(): Network contains already %u out of max. %u layers, cannot add a new layer.\n",
+                (unsigned int)nk->current_layer_ind + 1, (unsigned int)nk->n_layers);
         return EXIT_FAILURE;
     }
     layer *l = (layer *)malloc(sizeof(layer));
@@ -152,8 +149,8 @@ int add_layer(network *nk, layer *l)
 {
     if (nk->current_layer_ind >= nk->n_layers - 1)
     {
-        fprintf(stderr, "[ERROR] addinit_layer(): Network contains already %llu out of max. %llu layers, cannot add a new layer.\n",
-                nk->current_layer_ind + 1, nk->n_layers);
+        fprintf(stderr, "[ERROR] addinit_layer(): Network contains already %u out of max. %u layers, cannot add a new layer.\n",
+                (unsigned int)nk->current_layer_ind + 1, (unsigned int)nk->n_layers);
         return EXIT_FAILURE;
     }
     nk->layers[nk->current_layer_ind] = l;
