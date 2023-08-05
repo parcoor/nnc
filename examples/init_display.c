@@ -21,11 +21,19 @@ int example_init_display()
 
     print_network(stdout, &nk);
     // Persist network
-    persist_network(&nk, "examples/network.txt");
+    char *network_fp = "examples/network.txt";
+    printf("[INFO] Persisting network at %s\n", network_fp);
+    persist_network(&nk, network_fp);
     // Load network
-    load_network("examples/network.txt");
+    printf("[INFO] Loading network at %s\n", network_fp);
+    network loaded_nk;
+    load_network(&loaded_nk, network_fp);
+    printf("[INFO] network loaded:\n");
+    print_network(stdout, &loaded_nk);
+    // TODO: Debug segmentation fault by print_network()
 
     free_network(&nk);
+    free_network(&loaded_nk);
 
     return EXIT_SUCCESS;
 }

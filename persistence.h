@@ -11,6 +11,7 @@
 #define NETWORK_STAGE 3
 
 int persist_network(network *nk, char *fp);
-int load_network(char *fp);
+int name2activation(char *name);
+int load_network(network *nk, char *fp);
 
 #endif

@@ -1,5 +1,6 @@
 #include "persistence.h"
 #include "nnc_utils.h"
+#include "activations.h"
 
 int persist_network(network *nk, char *fp)
 {
@@ -15,16 +16,21 @@ int persist_network(network *nk, char *fp)
     return EXIT_SUCCESS;
 }
 
-bool is_figure(char c)
+int name2activation(char *name)
 {
-    return ((c == '0') || (c == '1') || (c == '2') || (c == '3') || (c == '4') || (c == '5') || (c == '6') || (c == '7') || (c == '8') || (c == '9'));
-}
-bool is_numeric(char c)
-{
-    return (is_figure(c) || (c == '-') || (c == '.'));
+    int activation = -1;
+    if (!strncmp(name, "Identity", 9))
+        activation = IDENTITY_ACT;
+    else if (!strncmp(name, "Sigmoid", 8))
+        activation = SIGMOID_ACT;
+    else if (!strncmp(name, "ReLu", 5))
+        activation = RELU_ACT;
+    else if (!strncmp(name, "Tanh", 5))
+        activation = TANH_ACT;
+    return activation;
 }
 
-int load_network(char *fp)
+int load_network(network *nk, char *fp)
 {
     FILE *f = fopen(fp, "r");
     if (f == NULL)
@@ -33,6 +39,7 @@ int load_network(char *fp)
         return EXIT_FAILURE;
     }
 
+    int ret;
     int c;
     bool preq;         // previous character was '='
     uint8_t neq = 0;   // number of previous eq signs
@@ -47,6 +54,11 @@ int load_network(char *fp)
     char current_ch[10] = {0}; // currently read value (integer, float or word)
     uint8_t current_ind = 0;   // character index when reading word or number
     uint8_t array_ind = 0;
+    uint16_t layer_ind_1 = 0, neuron_ind_1 = 0; // current index + 1
+    // current layer params
+    int cur_activation = -1;
+    uint16_t cur_input_size = 0, cur_n_neurons = 0;
+
     while ((c = fgetc(f)) != EOF)
     {
         if ((gonextline && (char)c != '\n') || (read_word && ((char)c == ' ' || (char)c == ':')))
@@ -56,28 +68,50 @@ int load_network(char *fp)
         {
             gonextline = false;
             is_firstword = true;
-            if (preq)
-            {
-                cur_stage = neq;
-                preq = false;
-            }
+
             if (neq > 0)
                 neq = 0;
+
             if (read_int)
             {
                 current_ch[current_ind] = '\0';
                 current_ind = 0;
                 read_int = false;
                 // TODO: attribute number to right value
-                printf("[DEBUG] load_network(): read int: %s\n", current_ch);
+                if ((cur_stage == NETWORK_STAGE) && !strncmp(firstword, "Max", 4))
+                {
+                    init_network(nk, (uint16_t)atoi(current_ch));
+                    nk->current_layer_ind = 0;
+                }
+                if ((cur_stage == LAYER_STAGE) && !strncmp(firstword, "Input", 6))
+                    cur_input_size = (uint16_t)atoi(current_ch);
+                if ((cur_stage == LAYER_STAGE) && !strncmp(firstword, "Number", 7))
+                    cur_n_neurons = (uint16_t)atoi(current_ch);
             }
             if (read_word)
             {
                 current_ch[current_ind] = '\0';
                 current_ind = 0;
                 read_word = false;
-                // TODO: attribute word to right value
-                printf("[DEBUG] load_network(): read word: %s\n", current_ch);
+                if ((cur_stage == LAYER_STAGE) && !strncmp(firstword, "Activation", 11))
+                {
+                    cur_activation = name2activation(current_ch);
+                    if (cur_activation == -1)
+                    {
+                        fprintf(stderr, "[ERROR] load_network(): Activation for layer %u could not be determined\n", layer_ind_1 + 1);
+                        free_network(nk);
+                        return EXIT_FAILURE;
+                    }
+                    ret = addinit_layer(nk, cur_input_size, cur_n_neurons, NO_INIT, cur_activation);
+                    if (ret == EXIT_FAILURE)
+                    {
+                        fprintf(stderr, "[ERROR] load_network(): Could not initialize layer %u\n", layer_ind_1 + 1);
+                        free_network(nk);
+                        return EXIT_FAILURE;
+                    }
+                    else
+                        layer_ind_1++;
+                }
             }
             continue;
         }
@@ -91,10 +125,16 @@ int load_network(char *fp)
 
         else if (preq && (char)c != '=')
         {
+            if ((cur_stage != NEURON_STAGE) && (neq == NEURON_STAGE))
+                neuron_ind_1 = 0;
+
             cur_stage = neq;
             neq = 0;
             preq = false;
             gonextline = true;
+
+            if (cur_stage == NEURON_STAGE)
+                neuron_ind_1++;
         }
 
         else if (is_firstword && (char)c != ' ' && (char)c != ':')
@@ -108,8 +148,6 @@ int load_network(char *fp)
             is_firstword = false;
             firstword[ind_firstword] = '\0';
             ind_firstword = 0;
-            printf("[DEBUG] load_network(): cur_stage=%i, firstword: %s\n", cur_stage, firstword);
-            // TODO: handle depending on cur_stage and firstword
             if (!strncmp(firstword, "Max", 4) || !strncmp(firstword, "Current", 8) || !strncmp(firstword, "Input", 5) || !strncmp(firstword, "Number", 7))
                 read_int = true;
             else if (!strncmp(firstword, "weights", 9) || !strncmp(firstword, "biases", 7))
@@ -128,8 +166,12 @@ int load_network(char *fp)
         {
             current_ch[current_ind] = '\0';
             current_ind = 0;
-            // TODO: attribute word to right value
-            printf("[DEBUG] load_network(): read array float: %s (index: %u)\n", current_ch, array_ind);
+            if (!strncmp(firstword, "weights", 8))
+                nk->layers[layer_ind_1 - 1]->neurons[neuron_ind_1 - 1]->weights[array_ind] = (float)atof(current_ch);
+            else if (!strncmp(firstword, "biases", 7))
+                nk->layers[layer_ind_1 - 1]->neurons[neuron_ind_1 - 1]->biases[array_ind] = (float)atof(current_ch);
+            else
+                printf("[WARNING] load_network(): Could not assign %s at position %u\n", current_ch, array_ind);
             array_ind++;
         }
 
@@ -138,8 +180,14 @@ int load_network(char *fp)
             current_ch[current_ind] = '\0';
             current_ind = 0;
             read_array = false;
-            // TODO: attribute word to right value
-            printf("[DEBUG] load_network(): read array float: %s (index: %u)\n", current_ch, array_ind);
+
+            if (!strncmp(firstword, "weights", 8))
+                nk->layers[layer_ind_1 - 1]->neurons[neuron_ind_1 - 1]->weights[array_ind] = (float)atof(current_ch);
+            else if (!strncmp(firstword, "biases", 7))
+                nk->layers[layer_ind_1 - 1]->neurons[neuron_ind_1 - 1]->biases[array_ind] = (float)atof(current_ch);
+            else
+                printf("[WARNING] load_network(): Could not assign %s at position %u\n", current_ch, array_ind);
+
             array_ind = 0;
         }
 

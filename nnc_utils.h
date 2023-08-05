@@ -6,6 +6,7 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 #include "architecture.h"
 
 #define NAME_SIZE 20
@@ -17,5 +18,7 @@ void print_neuron(FILE *f, neuron *neur);
 void get_activation_name(char activation_name[NAME_SIZE], int activation);
 void print_layer(FILE *f, layer *l);
 void print_network(FILE *f, network *nk);
+bool is_figure(char c);
+bool is_numeric(char c);
 
 #endif

@@ -20,6 +20,13 @@ int init_neuron(neuron *neur, uint16_t input_size, int initialization, float ini
         return EXIT_FAILURE;
     }
 
+    if (initialization == NO_INIT)
+    {
+        memset(neur->weights, 0, input_size * sizeof(float));
+        memset(neur->biases, 0, input_size * sizeof(float));
+        return EXIT_SUCCESS;
+    }
+
     for (uint16_t i = 0; i < input_size; i++)
     {
 
@@ -115,6 +122,7 @@ int init_network(network *nk, uint16_t n_layers)
         perror("[ERROR] init_network(): Could not allocate layers");
         return EXIT_FAILURE;
     }
+    memset(nk->layers, 0, n_layers * sizeof(layer *));
     return EXIT_SUCCESS;
 }
 

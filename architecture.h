@@ -7,6 +7,7 @@
 #include <math.h>
 #include <string.h>
 
+#define NO_INIT -1
 #define GLOROT_UNIFORM_INIT 0
 #define GLOROT_GAUSSIAN_INIT 1
 #define UNIFORM_INIT 2
