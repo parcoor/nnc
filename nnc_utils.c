@@ -123,3 +123,12 @@ bool is_numeric(char c)
 {
 	return (is_figure(c) || (c == '-') || (c == '.'));
 }
+
+float avg_matrix(size_t n_rows, size_t n_cols, float arr[n_rows][n_cols])
+{
+	float sum = 0.0;
+	for (size_t i = 0; i < n_rows; i++)
+		for (size_t j = 0; j < n_cols; j++)
+			sum += arr[i][j];
+	return sum / (float)(n_rows * n_cols);
+}

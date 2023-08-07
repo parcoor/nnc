@@ -21,5 +21,6 @@ void print_layer(FILE *f, layer *l);
 void print_network(FILE *f, network *nk);
 bool is_figure(char c);
 bool is_numeric(char c);
+float avg_matrix(size_t n_rows, size_t n_cols, float arr[n_rows][n_cols]);
 
 #endif

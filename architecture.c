@@ -36,10 +36,10 @@ int init_neuron(neuron *neur, uint16_t input_size, int initialization, float ini
                 neur->bias = gauss_rand(0.0, init_param);
             break;
         case NO_INIT:
+        default:
             neur->weights[i] = 0.0;
             if (i == 0)
                 neur->bias = 0.0;
-        default:
         }
     }
 
@@ -94,10 +94,10 @@ int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initializa
     switch (initialization)
     {
     case GLOROT_UNIFORM_INIT:
-        init_param = (float)sqrt(2.0 / ((float)input_size + (float)n_neurons));
+        init_param = (float)sqrt(6.0 / ((float)input_size + (float)n_neurons));
         break;
     case GLOROT_GAUSSIAN_INIT:
-        init_param = sqrt(6.0 / ((float)input_size + (float)n_neurons));
+        init_param = sqrt(2.0 / ((float)input_size + (float)n_neurons));
         break;
     case UNIFORM_INIT:
         init_param = 0.01;
@@ -187,7 +187,6 @@ int add_layer(network *nk, layer *l)
 void free_neuron(neuron *neur)
 {
     free(neur->weights);
-    free(neur->biases);
     return;
 }
 

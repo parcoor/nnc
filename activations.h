@@ -1,6 +1,7 @@
 #ifndef ACTIVATIONS_H
 #define ACTIVATIONS_H
 
+#include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
 
@@ -13,5 +14,6 @@ float identity(float x, bool derivative);
 float sigmoid(float x, bool derivative);
 float relu(float x, bool derivative);
 float tanhyp(float x, bool derivative);
+float activate(int activation, float x, bool derivative);
 
 #endif

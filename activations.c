@@ -30,3 +30,27 @@ float tanhyp(float x, bool derivative)
         ret = 1 - ret * ret;
     return ret;
 }
+
+float activate(int activation, float x, bool derivative)
+{
+    float value = 0.0;
+    switch (activation)
+    {
+    case IDENTITY_ACT:
+        value = identity(x, derivative);
+        break;
+    case SIGMOID_ACT:
+        value = sigmoid(x, derivative);
+        break;
+    case RELU_ACT:
+        value = relu(x, derivative);
+        break;
+    case TANH_ACT:
+        value = tanhyp(x, derivative);
+        break;
+    default:
+        printf("[WARNING] activate(): activation function not recognized (activation %i).\n", activation);
+        break;
+    }
+    return value;
+}
