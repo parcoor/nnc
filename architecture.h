@@ -17,8 +17,8 @@
 typedef struct neuron
 {
     uint16_t input_size;
+    float bias;
     float *weights;
-    float *biases;
 } neuron;
 
 typedef struct layer
@@ -28,7 +28,9 @@ typedef struct layer
     int activation;
     int initialization;
     neuron **neurons;
+    float *w_input; // weighted input
     float *output;
+    float *delta;
 } layer;
 
 typedef struct network

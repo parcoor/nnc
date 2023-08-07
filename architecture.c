@@ -12,18 +12,9 @@ int init_neuron(neuron *neur, uint16_t input_size, int initialization, float ini
         return EXIT_FAILURE;
     }
 
-    neur->biases = (float *)malloc(input_size * sizeof(float));
-    if (neur->biases == NULL)
-    {
-        fprintf(stderr, "[ERROR] init_neuron(): Could not allocate %u weights\n", (unsigned int)input_size);
-        free(neur->weights);
-        return EXIT_FAILURE;
-    }
-
     if (initialization == NO_INIT)
     {
         memset(neur->weights, 0, input_size * sizeof(float));
-        memset(neur->biases, 0, input_size * sizeof(float));
         return EXIT_SUCCESS;
     }
 
@@ -35,14 +26,20 @@ int init_neuron(neuron *neur, uint16_t input_size, int initialization, float ini
         case GLOROT_UNIFORM_INIT:
         case UNIFORM_INIT:
             neur->weights[i] = uniform_rand(-init_param, init_param);
-            neur->biases[i] = uniform_rand(-init_param, init_param);
+            if (i == 0)
+                neur->bias = uniform_rand(-init_param, init_param);
             break;
         case GLOROT_GAUSSIAN_INIT:
         case GAUSSIAN_INIT:
-        default:
             neur->weights[i] = gauss_rand(0.0, init_param);
-            neur->biases[i] = gauss_rand(0.0, init_param);
+            if (i == 0)
+                neur->bias = gauss_rand(0.0, init_param);
             break;
+        case NO_INIT:
+            neur->weights[i] = 0.0;
+            if (i == 0)
+                neur->bias = 0.0;
+        default:
         }
     }
 
@@ -56,19 +53,40 @@ int init_layer(layer *l, uint16_t input_size, uint16_t n_neurons, int initializa
     l->initialization = initialization;
     l->activation = activation;
 
+    l->w_input = (float *)malloc(n_neurons * sizeof(float));
+    if (l->w_input == NULL)
+    {
+        fprintf(stderr, "[ERROR] init_layer(): Could not allocate w_input (%u floats)\n", (unsigned int)n_neurons);
+        return EXIT_FAILURE;
+    }
+    memset(l->w_input, 0, n_neurons * sizeof(float));
+
     l->output = (float *)malloc(n_neurons * sizeof(float));
     if (l->output == NULL)
     {
         fprintf(stderr, "[ERROR] init_layer(): Could not allocate output (%u floats)\n", (unsigned int)n_neurons);
-        free(l->neurons);
+        free(l->w_input);
         return EXIT_FAILURE;
     }
     memset(l->output, 0, n_neurons * sizeof(float));
+
+    l->delta = (float *)malloc(n_neurons * sizeof(float));
+    if (l->delta == NULL)
+    {
+        fprintf(stderr, "[ERROR] init_layer(): Could not allocate delta (%u floats)\n", (unsigned int)n_neurons);
+        free(l->w_input);
+        free(l->output);
+        return EXIT_FAILURE;
+    }
+    memset(l->delta, 0, n_neurons * sizeof(float));
 
     l->neurons = (neuron **)malloc(n_neurons * sizeof(neuron *));
     if (l->neurons == NULL)
     {
         fprintf(stderr, "[ERROR] init_layer(): Could not allocate %u neurons in layer.\n", (unsigned int)n_neurons);
+        free(l->output);
+        free(l->w_input);
+        free(l->delta);
         return EXIT_FAILURE;
     }
 
@@ -177,6 +195,9 @@ void free_layer(layer *l)
 {
     for (uint16_t i = 0; i < l->n_neurons; i++)
         free_neuron(l->neurons[i]);
+    free(l->w_input);
+    free(l->output);
+    free(l->delta);
     free(l->neurons);
     return;
 }

@@ -49,13 +49,23 @@ void print_array(FILE *f, size_t n, float arr[n])
 	return;
 }
 
+void print_matrix(FILE *f, size_t n_rows, size_t n_cols, float mat[n_rows][n_cols])
+{
+	fprintf(f, "[\n");
+	for (size_t i = 0; i < n_rows; i++)
+	{
+		fprintf(f, "\t");
+		print_array(f, n_cols, mat[i]);
+	}
+	fprintf(f, "]\n");
+}
+
 void print_neuron(FILE *f, neuron *neur)
 {
 	fprintf(f, "Input size: %u\n", (unsigned int)neur->input_size);
 	fprintf(f, "weights: ");
 	print_array(f, (size_t)neur->input_size, neur->weights);
-	fprintf(f, "biases: ");
-	print_array(f, (size_t)neur->input_size, neur->biases);
+	fprintf(f, "bias: %f\n", neur->bias);
 }
 
 void get_activation_name(char activation_name[NAME_SIZE], int activation)
