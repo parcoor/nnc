@@ -76,10 +76,22 @@ int batch_forward(network *nk, uint16_t batch_s, uint16_t input_s, float input[b
     return EXIT_SUCCESS;
 }
 
-int backpropagation(network *nk, uint16_t output_s, float error[output_s], float lr)
+int backpropagation(network *nk, uint16_t output_s, float error[output_s], uint16_t input_s, float input[input_s], float lr)
 {
-    uint16_t layer_ind, neuron_ind, neuron_ind_1;      // neuron_ind_1: next layer neurons ind
-    float neuron_err = 0.0, sigma_prime = 0.0, op = 0; // op: output of current neuron
+    // Check if output_s and input_s fit
+    if (output_s != nk->layers[nk->n_layers - 1]->n_neurons)
+    {
+        fprintf(stderr, "[ERROR] backpropagation(): Size of error: %f different of network output size: %u.\n", output_s, nk->layers[nk->n_layers - 1]->n_neurons);
+        return EXIT_FAILURE;
+    }
+    if (input_s != nk->layers[0]->input_size)
+    {
+        fprintf(stderr, "[ERROR] backpropagation(): Network input size: %u different as provided input size: %u.\n", input_s, nk->layers[0]->input_size);
+        return EXIT_FAILURE;
+    }
+
+    uint16_t layer_ind, neuron_ind, neuron_ind_1, weight_ind;          // neuron_ind_1: next layer neurons ind
+    float neuron_err = 0.0, sigma_prime = 0.0, op = 0, activation = 0; // op: output of current neuron
     float d = 0.0;
 
     for (layer_ind = nk->n_layers - 1; layer_ind >= 0; layer_ind--)
@@ -116,6 +128,16 @@ int backpropagation(network *nk, uint16_t output_s, float error[output_s], float
             }
             d = neuron_err * sigma_prime;
             nk->layers[layer_ind]->delta[neuron_ind] = d;
+
+            // Update neuron biase
+            nk->layers[layer_ind]->neurons[neuron_ind]->bias -= lr * d;
+            // Update neuron weights
+            for (weight_ind = 0; weight_ind < nk->layers[layer_ind]->neurons[neuron_ind]->input_size; weight_ind++)
+            {
+                activation = (layer_ind == 0) ? input[weight_ind] : nk->layers[layer_ind - 1]->output[weight_ind];
+                nk->layers[layer_ind]->neurons[neuron_ind]->weights[weight_ind] -= lr * activation * d;
+            }
         }
     }
+    return EXIT_SUCCESS;
 }
