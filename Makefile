@@ -1,17 +1,15 @@
 CC = gcc
 CFLAGS = -Wall -Werror
 DFLAGS = -g -O0
+DEPS = architecture.c activations.c nnc_utils.c pass.c losses.c metrics.c
 # LFLAGS = -lm  # For Linux
 
 
-example_init_display.exe: examples/init_display.c architecture.c activations.c persistence.c nnc_utils.c pass.c
+init_store_load.exe: examples/init_store_load.c $(DEPS)
 	$(CC) -o $@ $^ $(CFLAGS) -lm
 
-example_init_display_debug.exe: examples/init_display.c architecture.c activations.c persistence.c nnc_utils.c pass.c
-	$(CC) -o $@ $^ $(CFLAGS) -lm $(DFLAGS)
-
-xor_training.exe: examples/xor_training.c architecture.c activations.c nnc_utils.c pass.c losses.c metrics.c
+xor_training_cyclical.exe: examples/xor_training_cyclical.c $(DEPS)
 	$(CC) -o $@ $^ $(CFLAGS) -lm
 
-xor_training_debug.exe: examples/xor_training.c architecture.c activations.c nnc_utils.c pass.c losses.c metrics.c
-	$(CC) -o $@ $^ $(CFLAGS) -lm $(DFLAGS)
+sin_history.exe: examples/sin_history.c $(DEPS)
+	$(CC) -o $@ $^ $(CFLAGS) -lm

@@ -35,21 +35,28 @@ int main()
     float error[batch_s][output_s];
     float loss[batch_s][output_s];
     float avg_loss = 0.0;
-    float lr = 0.001;
+    float lr = 0.0;
     float accuracy = 0.0;
 
     uint16_t n_batches = 1000;
     for (uint16_t batch_ind = 0; batch_ind < n_batches; batch_ind++)
     {
+        // Generate training data
         generate_xor_batch(batch_s, X, y_true);
 
+        // Compute cyclical learning rate
+        lr = sin((double)batch_ind / 10) * 0.001 + 0.002;
+
+        // Forward training data through the neural network nk
         batch_forward(&nk, batch_s, input_s, X, output_s, y_pred);
+        // Compute accuracy metric
         accuracy = acc(batch_s, y_true, y_pred, 0.5);
         // Compute error for back-propagation: parameter derivative = true
         loss_batch(BINARY_CROSS_ENTROPY_LOSS, batch_s, output_s, y_pred, y_true, true, error);
         // compute loss for metric: derivative = false
         loss_batch(BINARY_CROSS_ENTROPY_LOSS, batch_s, output_s, y_pred, y_true, false, loss);
         avg_loss = avg_matrix((size_t)batch_s, (size_t)output_s, loss);
+        // Print out current info about loss and accuracy
         printf("[INFO] XOR Training: Loss at batch %u = %f, acc=%f\n", batch_ind, avg_loss, accuracy);
         // backpropagation for training (weight adaptation)
         backpropagation_batch(&nk, batch_s, output_s, error, input_s, X, lr);

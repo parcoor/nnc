@@ -35,7 +35,6 @@ int forward(network *nk, uint16_t input_s, float input[input_s], uint16_t output
             nk->layers[layer_ind]->w_input[neuron_ind] = w_input;
             neur_output = activate(nk->layers[layer_ind]->activation, w_input, false);
             nk->layers[layer_ind]->output[neuron_ind] = neur_output;
-            // printf("[DEBUG] forward(): nk->layers[%u]->output[%u] = %f (neur_output = %f)\n", layer_ind, neuron_ind, nk->layers[layer_ind]->output[neuron_ind], neur_output);
         }
     }
 

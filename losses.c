@@ -6,7 +6,7 @@ float mse(float y_pred, float y_true, bool derivative)
 {
     float ret = 0.0;
     if (derivative)
-        ret = 2 * (y_true - y_pred);
+        ret = -2.0 * (y_true - y_pred);
     else
         ret = (y_true - y_pred) * (y_true - y_pred);
     return ret;
