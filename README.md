@@ -14,7 +14,7 @@ The folder [examples](examples/) shows different ways to use this library:
 
 ## Structure
 
-- [architecture.h](architecture.h) contains the definition of the different bricks to build a neural network, such as the neural network itself, a layer, a neuron.
-- [activation.h](activations.h) contains the definition of the different activation functions that can be used for the layers.
-- [losses.h](losses.h) contains the definition of the loss function that can be used to train a neural netwwork through backpropagation, depending on the task at hand (regression, classification...)
-- [metrics.h](metrics.h) contains metrics that can be used to assess a neural network training or inference.
+- [architecture.h](src/architecture.h) contains the definition of the different bricks to build a neural network, such as the neural network itself, a layer, a neuron.
+- [activation.h](src/activations.h) contains the definition of the different activation functions that can be used for the layers.
+- [losses.h](src/losses.h) contains the definition of the loss function that can be used to train a neural netwwork through backpropagation, depending on the task at hand (regression, classification...)
+- [metrics.h](src/metrics.h) contains metrics that can be used to assess a neural network training or inference.

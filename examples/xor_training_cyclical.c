@@ -1,9 +1,9 @@
-#include "../architecture.h"
-#include "../activations.h"
-#include "../nnc_utils.h"
-#include "../pass.h"
-#include "../losses.h"
-#include "../metrics.h"
+#include "../src/architecture.h"
+#include "../src/activations.h"
+#include "../src/nnc_utils.h"
+#include "../src/pass.h"
+#include "../src/losses.h"
+#include "../src/metrics.h"
 
 void generate_xor_batch(uint16_t batch_s, float X[batch_s][2], float y[batch_s][1])
 {

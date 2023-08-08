@@ -1,9 +1,9 @@
-#include "../architecture.h"
-#include "../activations.h"
-#include "../nnc_utils.h"
-#include "../pass.h"
-#include "../losses.h"
-#include "../metrics.h"
+#include "../src/architecture.h"
+#include "../src/activations.h"
+#include "../src/nnc_utils.h"
+#include "../src/pass.h"
+#include "../src/losses.h"
+#include "../src/metrics.h"
 
 #define PI 3.141592
 

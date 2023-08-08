@@ -1,8 +1,8 @@
-#include "../architecture.h"
-#include "../activations.h"
-#include "../persistence.h"
-#include "../nnc_utils.h"
-#include "../pass.h"
+#include "../src/architecture.h"
+#include "../src/activations.h"
+#include "../src/persistence.h"
+#include "../src/nnc_utils.h"
+#include "../src/pass.h"
 
 int example_init_display()
 {

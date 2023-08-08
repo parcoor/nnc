@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Werror
 DFLAGS = -g -O0
-DEPS = architecture.c activations.c nnc_utils.c pass.c losses.c metrics.c
+DEPS = src/architecture.c src/activations.c src/nnc_utils.c src/pass.c src/losses.c src/metrics.c
 # LFLAGS = -lm  # For Linux
 
 
